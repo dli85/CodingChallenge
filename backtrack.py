@@ -20,11 +20,10 @@ lock = threading.Lock()
 
 
 # Searches a DAG (represented as adjacency matrix) and uses the timer.
-def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose=True):
+def search_dag(start_node, prev_node, adj_mat, base_time, wait_time, results, seen, verbose=True):
     time.sleep(wait_time)
 
-    #Lock the shared resources before reading/writing
-
+    # Lock the shared resources before reading/writing
     lock.acquire()
     try:
         if start_node in seen:
@@ -32,24 +31,25 @@ def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose
         seen.add(start_node)
 
         if verbose:
-            print(start_node, time.time() - base_time)
-        results.append((start_node, time.time() - base_time))
+            print(start_node, f"from {prev_node} -x", time.time() - base_time)
+        results.append((start_node, f"from {prev_node}", time.time() - base_time))
     finally:
         lock.release()
-
     threads = []
 
     for child in adj_mat[start_node]:
 
         # Create new thread for the child, so it can start its timer in parallel with other children
         t = threading.Thread(target=search_dag,
-                             args=(child, adj_mat,base_time, adj_mat[start_node][child], results, seen, verbose))
+                             args=(child, start_node, adj_mat,base_time, adj_mat[start_node][child], results, seen, verbose))
 
         threads.append(t)
 
         t.start()
 
-    # thread.join blocks the main thread until other threads are finished, also handles resource cleanup
+        # Blocks the main thread until this/all children threads are finished, also handles resource cleanup
+        # t.join()
+
     for thread in threads:
         thread.join()
 
@@ -83,7 +83,7 @@ def parse_json(path):
 def run(path, verbose=True):
     adj_mat, starting_node = parse_json(path)
     results = []
-    search_dag(starting_node, adj_mat, time.time(), 0, results, set(), verbose)
+    search_dag(starting_node, None, adj_mat, time.time(), 0, results, set(), verbose)
 
     if verbose:
         print(results)

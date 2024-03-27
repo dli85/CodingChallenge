@@ -2,13 +2,12 @@ import unittest
 from main import run
 import logging
 
-
 class TestDAGSearch(unittest.TestCase):
 
     # Checks if two result lists (of the DAG search) are equivalent.
     # timestamps/floats will not be exactly equivalent, so check if they are roughly equivalent to each other
     # Assumes each element in both lists are (string, number)
-    # Assumes the two lists are not affected by race conditions.
+    # Checks for race conditions.
     def compare_results(self, l1, l2):
         dict1 = {}
         dict2 = {}
@@ -77,8 +76,21 @@ class TestDAGSearch(unittest.TestCase):
         result = run(path, False)
         self.compare_results(result, expected_result)
 
+    def testDAG8(self):
+        path = 'DAGs/DAG8.json'
+        expected_result = [('A', 0), ('B', 1), ('D', 1), ('C', 3)]
+        result = run(path, False)
+        self.compare_results(result, expected_result)
+
+    def testDAG9(self):
+        path = 'DAGs/DAG9.json'
+        expected_result = [('A', 0), ('C', 1), ('D', 3), ('B', 4), ('F', 4), ('E', 5)]
+        result = run(path, False)
+        self.compare_results(result, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
+
 
 
