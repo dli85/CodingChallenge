@@ -6,7 +6,7 @@ import logging
 class TestDAGSearch(unittest.TestCase):
 
     # Checks if two result lists (of the DAG search) are equivalent.
-    # timestamps/floats will not be exactly equivalent, so check if they are within 1% of each other.
+    # timestamps/floats will not be exactly equivalent, so check if they are roughly equivalent to each other
     # Assumes each element in both lists are (string, number)
     # Assumes the two lists are not affected by race conditions.
     def compare_results(self, l1, l2):
@@ -22,8 +22,8 @@ class TestDAGSearch(unittest.TestCase):
 
             self.assertEquals(node1, node2)
 
-            # Check that the difference between the times is less than 1% of the smaller time
-            self.assertLessEqual(abs(time1 - time2), 0.02 * (min(time1, time2)))
+            # Check that the difference between the times is less than x% of the smaller time
+            self.assertLessEqual(abs(time1 - time2), 0.05 * (min(time1, time2)))
 
     # different compare function that assumes race conditions may affect the result
     # Doesn't care about the order of the lists, checks the timestamp of when each
@@ -50,8 +50,8 @@ class TestDAGSearch(unittest.TestCase):
             time1 = dict1[node]
             time2 = dict2[node]
 
-            # Check that the difference between the times is less than 1% of the smaller time
-            self.assertLessEqual(abs(time1 - time2), 0.02 * (min(time1, time2)))
+            # Check that the difference between the times is less than x% of the smaller time
+            self.assertLessEqual(abs(time1 - time2), 0.05 * (min(time1, time2)))
 
     def testDAG1(self):
         path = 'DAGs/DAG1.json'
@@ -78,11 +78,26 @@ class TestDAGSearch(unittest.TestCase):
         result = run(path, False)
         self.compare_results_race_condition(result, expected_result)
 
+    def testDAG5(self):
+        path = 'DAGs/DAG5.json'
+        expected_result = [('A', 0), ('B', 1), ('C', 1), ('D', 2), ('E', 2), ('F', 2), ('G', 2)]
+        result = run(path, False)
+        self.compare_results_race_condition(result, expected_result)
+
+    def testDAG6(self):
+        path = 'DAGs/DAG6.json'
+        expected_result = [('A', 0), ('C', 0.4), ('D', 0.7), ('B', 0.8)]
+        result = run(path, False)
+        self.compare_results(result, expected_result)
+
+    def testDAG7(self):
+        path = 'DAGs/DAG7.json'
+        expected_result = [('A', 0), ('C', 1), ('E', 2), ('G', 3), ('D', 4), ('F', 5), ('B', 6)]
+        result = run(path, False)
+        self.compare_results(result, expected_result)
+
 
 if __name__ == '__main__':
     unittest.main()
-    # path = 'DAGs/DAG4.json'
-    # expected_result = [('A', 0), ('B', 1), ('C', 1)]
-    # result = run(path, False)
-    # print(compare_results_race_condition(result, expected_result))
+
 

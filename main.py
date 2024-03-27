@@ -2,7 +2,9 @@ import json
 import time
 import threading
 
-JSON_PATH = 'DAGs/DAG3.json'
+# https://csacademy.com/app/graph_editor/
+
+JSON_PATH = 'DAGs/DAG6.json'
 
 '''
 Adjacent matrix structure:
