@@ -4,7 +4,7 @@ import threading
 
 # https://csacademy.com/app/graph_editor/
 
-JSON_PATH = 'DAGs/DAG6.json'
+JSON_PATH = 'DAGs/DAG1.json'
 
 '''
 Adjacent matrix structure:
@@ -16,9 +16,20 @@ Adjacent matrix structure:
 }
 '''
 
+lock = threading.Lock()
+
 
 # Searches a DAG (represented as adjacency matrix) and uses the timer.
-def search_dag(start_node, adj_mat, base_time, wait_time, results, verbose):
+def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose=True):
+    if start_node in seen:
+        return
+
+    lock.acquire()
+    try:
+        seen.add(start_node)
+    finally:
+        lock.release()
+
     time.sleep(wait_time)
     if verbose:
         print(start_node, time.time() - base_time)
@@ -27,8 +38,10 @@ def search_dag(start_node, adj_mat, base_time, wait_time, results, verbose):
     threads = []
 
     for child in adj_mat[start_node]:
+
         # Create new thread for the child, so it can start its timer in parallel with other children
-        t = threading.Thread(target=search_dag, args=(child, adj_mat, base_time, adj_mat[start_node][child], results, verbose))
+        t = threading.Thread(target=search_dag,
+                             args=(child, adj_mat,base_time, adj_mat[start_node][child], results, seen, verbose))
 
         threads.append(t)
 
@@ -70,7 +83,7 @@ def parse_json(path):
 def run(path, verbose=True):
     adj_mat, starting_node = parse_json(path)
     results = []
-    search_dag(starting_node, adj_mat, time.time(), 0, results, verbose)
+    search_dag(starting_node, adj_mat, time.time(), 0, results, set(), verbose)
 
     if verbose:
         print(results)

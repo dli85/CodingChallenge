@@ -10,25 +10,6 @@ class TestDAGSearch(unittest.TestCase):
     # Assumes each element in both lists are (string, number)
     # Assumes the two lists are not affected by race conditions.
     def compare_results(self, l1, l2):
-        # if lengths are not the same, lists can't be equivalent
-        self.assertEquals(len(l1), len(l2))
-
-        # List lengths are equal, does not matter if we use l1 or l2
-        for i in range(len(l1)):
-            node1 = l1[i][0]
-            time1 = l1[i][1]
-            node2 = l2[i][0]
-            time2 = l2[i][1]
-
-            self.assertEquals(node1, node2)
-
-            # Check that the difference between the times is less than x% of the smaller time
-            self.assertLessEqual(abs(time1 - time2), 0.05 * (min(time1, time2)))
-
-    # different compare function that assumes race conditions may affect the result
-    # Doesn't care about the order of the lists, checks the timestamp of when each
-    # node was printed.
-    def compare_results_race_condition(self, l1, l2):
         dict1 = {}
         dict2 = {}
 
@@ -76,13 +57,13 @@ class TestDAGSearch(unittest.TestCase):
         path = 'DAGs/DAG4.json'
         expected_result = [('A', 0), ('B', 1), ('C', 1)]
         result = run(path, False)
-        self.compare_results_race_condition(result, expected_result)
+        self.compare_results(result, expected_result)
 
     def testDAG5(self):
         path = 'DAGs/DAG5.json'
         expected_result = [('A', 0), ('B', 1), ('C', 1), ('D', 2), ('E', 2), ('F', 2), ('G', 2)]
         result = run(path, False)
-        self.compare_results_race_condition(result, expected_result)
+        self.compare_results(result, expected_result)
 
     def testDAG6(self):
         path = 'DAGs/DAG6.json'
