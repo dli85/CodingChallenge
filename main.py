@@ -20,15 +20,17 @@ lock = threading.Lock()
 
 
 # Searches a DAG (represented as adjacency matrix) and uses the timer.
+# Verbose determines if outputs should be printed (False for testing)
 def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose=True):
     time.sleep(wait_time)
 
-    #Lock the shared resources before reading/writing
-
+    # Lock the shared resources before reading/writing
     lock.acquire()
     try:
+        # Check that we haven't visited this node before
         if start_node in seen:
             return
+
         seen.add(start_node)
 
         if verbose:
@@ -40,7 +42,6 @@ def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose
     threads = []
 
     for child in adj_mat[start_node]:
-
         # Create new thread for the child, so it can start its timer in parallel with other children
         t = threading.Thread(target=search_dag,
                              args=(child, adj_mat,base_time, adj_mat[start_node][child], results, seen, verbose))
@@ -49,7 +50,7 @@ def search_dag(start_node, adj_mat, base_time, wait_time, results, seen, verbose
 
         t.start()
 
-    # thread.join blocks the main thread until other threads are finished, also handles resource cleanup
+    # thread.join blocks the main thread until other threads are finished, also handles resource cleanup for threads
     for thread in threads:
         thread.join()
 
@@ -78,7 +79,8 @@ def parse_json(path):
     return adj_mat, start
 
 
-# Searches a DAG from a json file, returns the result as a list
+# main function for the algorithm:
+# Searches a DAG from a json file, returns the result of the search as a list
 # Verbose determines if outputs should be printed
 def run(path, verbose=True):
     adj_mat, starting_node = parse_json(path)
@@ -92,4 +94,5 @@ def run(path, verbose=True):
 
 
 if __name__ == '__main__':
+    # return value is only used for testing
     _ = run(JSON_PATH)

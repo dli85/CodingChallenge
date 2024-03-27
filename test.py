@@ -2,6 +2,9 @@ import unittest
 from main import run
 import logging
 
+times = 15
+
+
 class TestDAGSearch(unittest.TestCase):
 
     # Checks if two result lists (of the DAG search) are equivalent.
@@ -31,62 +34,81 @@ class TestDAGSearch(unittest.TestCase):
             time2 = dict2[node]
 
             # Check that the difference between the times is less than x% of the smaller time
-            self.assertLessEqual(abs(time1 - time2), 0.05 * (min(time1, time2)))
+            # self.assertLessEqual(abs(time1 - time2), 0.05 * (min(time1, time2)))
+            self.assertLessEqual(abs(time1 - time2), 0.05)
 
+    # Basic DAG from problem description
     def testDAG1(self):
-        path = 'DAGs/DAG1.json'
-        expected_result = [('A', 0), ('B', 5), ('C', 7)]
-        result = run(path, False)
-        logging.debug(expected_result)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG1.json'
+            expected_result = [('A', 0), ('B', 5), ('C', 7)]
+            result = run(path, False)
+            logging.debug(expected_result)
+            self.compare_results(result, expected_result)
 
+    # DAG with 1 node
     def testDAG2(self):
-        path = 'DAGs/DAG2.json'
-        expected_result = [('A', 0)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG2.json'
+            expected_result = [('A', 0)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # DAG with 2 levels of children
     def testDAG3(self):
-        path = 'DAGs/DAG3.json'
-        expected_result = [('A', 0), ('B', 1), ('D', 2), ('E', 3), ('C', 5)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG3.json'
+            expected_result = [('A', 0), ('B', 1), ('D', 2), ('E', 3), ('C', 5)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # DAG with simultaneous finishing/race conditions
     def testDAG4(self):
-        path = 'DAGs/DAG4.json'
-        expected_result = [('A', 0), ('B', 1), ('C', 1)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG4.json'
+            expected_result = [('A', 0), ('B', 1), ('C', 1)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # Even more race conditions
     def testDAG5(self):
-        path = 'DAGs/DAG5.json'
-        expected_result = [('A', 0), ('B', 1), ('C', 1), ('D', 2), ('E', 2), ('F', 2), ('G', 2)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG5.json'
+            expected_result = [('A', 0), ('B', 1), ('C', 1), ('D', 2), ('E', 2), ('F', 2), ('G', 2)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # Fractional edge weights
     def testDAG6(self):
-        path = 'DAGs/DAG6.json'
-        expected_result = [('A', 0), ('C', 0.4), ('D', 0.7), ('B', 0.8)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG6.json'
+            expected_result = [('A', 0), ('C', 0.4), ('D', 0.7), ('B', 0.8)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # DAG with more than 2 children
     def testDAG7(self):
-        path = 'DAGs/DAG7.json'
-        expected_result = [('A', 0), ('C', 1), ('E', 2), ('G', 3), ('D', 4), ('F', 5), ('B', 6)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG7.json'
+            expected_result = [('A', 0), ('C', 1), ('E', 2), ('G', 3), ('D', 4), ('F', 5), ('B', 6)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # DAG with multiple paths leading to an edge
     def testDAG8(self):
-        path = 'DAGs/DAG8.json'
-        expected_result = [('A', 0), ('B', 1), ('D', 1), ('C', 3)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG8.json'
+            expected_result = [('A', 0), ('B', 1), ('D', 1), ('C', 3)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
+    # Even more paths!!
     def testDAG9(self):
-        path = 'DAGs/DAG9.json'
-        expected_result = [('A', 0), ('C', 1), ('D', 3), ('B', 4), ('F', 4), ('E', 5)]
-        result = run(path, False)
-        self.compare_results(result, expected_result)
+        for _ in range(times):
+            path = 'DAGs/DAG9.json'
+            expected_result = [('A', 0), ('C', 1), ('D', 3), ('B', 4), ('F', 4), ('E', 5)]
+            result = run(path, False)
+            self.compare_results(result, expected_result)
 
 
 if __name__ == '__main__':
